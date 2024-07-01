@@ -20,27 +20,27 @@ class Client extends CI_Controller {
     }
     
 
-    // public function payment_status_by_client() {
-    //     $proprio_data = $this->session->userdata('client');
-    //     if (!$proprio_data) {
-    //         redirect('login/login_proprio_view');
-    //     }
-    //     $id_client = $proprio_data['id_client'];
-    //     $start_date = $this->input->post('start_date');
-    //     $end_date = $this->input->post('end_date');
+    public function payment_status_by_client() {
+        $proprio_data = $this->session->userdata('client');
+        if (!$proprio_data) {
+            redirect('login/login_proprio_view');
+        }
+        $id_client = $proprio_data['id_client'];
+        $start_date = $this->input->post('start_date');
+        $end_date = $this->input->post('end_date');
         
         
-    //     log_message('debug', 'Start Date: ' . $start_date);
-    //     log_message('debug', 'End Date: ' . $end_date);
-    //     log_message('debug', 'Client ID: ' . $id_client);
+        log_message('debug', 'Start Date: ' . $start_date);
+        log_message('debug', 'End Date: ' . $end_date);
+        log_message('debug', 'Client ID: ' . $id_client);
     
-    //     $data['results'] = array();
-    //     if ($start_date && $end_date && $id_client) {
-    //         $data['results'] = $this->Location_model->get_payment_status_by_client($id_client, $start_date, $end_date);
-    //     }
+        $data['results'] = array();
+        if ($start_date && $end_date && $id_client) {
+            $data['results'] = $this->Location_model->get_payment_status_by_client($id_client, $start_date, $end_date);
+        }
         
-    //     $this->load->view('client/loyer', $data);
-    // }
+        $this->load->view('client/loyer', $data);
+    }
     
     
 }
