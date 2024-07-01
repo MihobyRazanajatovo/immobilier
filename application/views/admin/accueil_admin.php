@@ -27,6 +27,18 @@
                                 </form>
                             </div>
                         </div>
+                        <div class="card-body d-flex justify-content-between">
+                            <div class="header-title">
+                                <h4 class="card-title">Import csv</h4>
+                                <form action="<?php echo base_url('Import/csv_import_biens'); ?>" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="csv_file_biens">Importer un fichier CSV</label>
+                                        <input type="file" name="csv_file_biens" class="form-control" required>
+                                    </div>
+                                    <button type="submit" name="import" class="btn btn-primary">Importer</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

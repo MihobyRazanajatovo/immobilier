@@ -53,4 +53,38 @@ class Bien_model extends CI_Model {
         $query = $this->db->get();
         return $query->row_array();
     }
+
+    public function get_biens_with_details() {
+        $this->db->select('
+            b.id_bien,
+            b.nom AS nom_bien,
+            b.description,
+            b.region,
+            b.loyer_mois,
+            p.tel AS tel_proprietaire,
+            t.nom AS type_bien,
+            l.date_debut,
+            l.date_fin_prevu,
+            l.duree_mois,
+            l.disponibilite
+        ');
+        $this->db->from('bien b');
+        $this->db->join('location l', 'b.id_bien = l.id_bien', 'left');
+        $this->db->join('proprietaire p', 'b.id_proprietaire = p.id_proprietaire', 'left');
+        $this->db->join('type_bien t', 'b.id_type_bien = t.id_type_bien', 'left');
+        $this->db->where('l.disponibilite IS NOT NULL');
+
+        $biens = $this->db->get()->result_array();
+
+        foreach ($biens as &$bien) {
+            $this->db->select('photo_url');
+            $this->db->from('photo');
+            $this->db->where('id_bien', $bien['id_bien']);
+            $photos = $this->db->get()->result_array();
+            $bien['photos'] = $photos;
+        }
+
+        return $biens;
+    }
+    
 }

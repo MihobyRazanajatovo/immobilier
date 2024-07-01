@@ -16,6 +16,7 @@
             border-color: #eb631b;
             color: #fff;
         }
+
         .btn-custom:hover {
             background-color: #d9541a;
             border-color: #d9541a;
@@ -30,7 +31,7 @@
             <div class="row">
                 <div class="col-sm-12 col-lg-12">
                     <div class="card">
-                    <div class="card-header">
+                        <div class="card-header">
                             <h4>Chiffre d'Affaires du propriétaire</h4>
                         </div>
                         <div class="card-body">
@@ -59,8 +60,9 @@
                                         <tbody>
                                             <?php foreach ($results as $row) : ?>
                                                 <tr>
-                                                    <td><?php echo $row->mois; ?></td>
-                                                    <td><?php echo number_format($row->chiffre_affaires, 2); ?></td>
+                                                    <td><?php echo $row['month']; ?></td>
+                                                    <td><?php echo $row['total_gain']; ?></td>
+                                                    <td><?php echo $row['chiffre_affaire_mensuel']; ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>

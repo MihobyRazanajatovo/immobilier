@@ -31,6 +31,7 @@ CREATE TABLE bien (
   loyer_mois INT,
   id_proprietaire INT,
   id_type_bien INT,
+  reference VARCHAR(30),
   FOREIGN KEY (id_proprietaire) REFERENCES proprietaire(id_proprietaire),
   FOREIGN KEY (id_type_bien) REFERENCES type_bien(id_type_bien)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -50,6 +51,7 @@ CREATE TABLE location (
   date_fin_prevu DATE,
   date_fin_reelle DATE,
   duree_mois INT,
+  disponibilite DATE,
   FOREIGN KEY (id_bien) REFERENCES bien(id_bien),
   FOREIGN KEY (id_client) REFERENCES client(id_client)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -579,9 +581,243 @@ ORDER BY
 | 2024-02 |                  200000 |
 | 2024-03 |                  350000 |
 | 2024-04 |                  200000 |
-| 2024-05 |                 1250000 |
+| 2024-05 |                 1250000 | 
 | 2024-06 |                 1750000 |
 | 2024-07 |                 1750000 |
 | 2024-08 |                  400000 |
 | 2024-09 |                  400000 |
 +---------+-------------------------+
+-- filtre chiffre d'affaire
+SELECT
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+    SUM(b.loyer_mois) AS chiffre_affaire_mensuel
+FROM
+    location l
+JOIN
+    bien b ON l.id_bien = b.id_bien
+JOIN
+    numbers ON numbers.n < l.duree_mois
+WHERE
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') BETWEEN '2024-03' AND '2024-06'
+GROUP BY
+    month
+ORDER BY
+    month;
+
+-- rank détails location par location 
+SELECT
+    l.id_location,
+    l.id_client,
+    b.nom,
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+    b.loyer_mois
+FROM
+    location l
+JOIN
+    bien b ON l.id_bien = b.id_bien
+JOIN
+    numbers ON numbers.n < l.duree_mois
+ORDER BY
+    l.id_location,
+    month;
+
++-------------+-----------+--------------------+---------+------------+
+| id_location | id_client | nom                | month   | loyer_mois |
++-------------+-----------+--------------------+---------+------------+
+|           1 |         1 | maison de vacances | 2024-02 |     200000 |
+|           1 |         1 | maison de vacances | 2024-03 |     200000 |
+|           1 |         1 | maison de vacances | 2024-04 |     200000 |
+|           1 |         1 | maison de vacances | 2024-05 |     200000 |
+|           2 |         3 | appart de lux      | 2024-05 |     400000 |
+|           2 |         3 | appart de lux      | 2024-06 |     400000 |
+|           2 |         3 | appart de lux      | 2024-07 |     400000 |
+|           2 |         3 | appart de lux      | 2024-08 |     400000 |
+|           2 |         3 | appart de lux      | 2024-09 |     400000 |
+|           3 |         1 | villa bleu         | 2024-05 |     500000 |
+|           3 |         1 | villa bleu         | 2024-06 |     500000 |
+|           3 |         1 | villa bleu         | 2024-07 |     500000 |
+|           4 |         2 | batiment A         | 2024-06 |     700000 |
+|           4 |         2 | batiment A         | 2024-07 |     700000 |
+|           5 |         2 | maison de campagne | 2024-03 |     150000 |
+|           6 |         3 | maison de campagne | 2024-05 |     150000 |
+|           6 |         3 | maison de campagne | 2024-06 |     150000 |
+|           6 |         3 | maison de campagne | 2024-07 |     150000 |
++-------------+-----------+--------------------+---------+------------+
+
+
+-- gain avec filtre 
+ SELECT
+    l.id_location,
+    l.id_client,
+    b.nom AS bien_nom,
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+    b.loyer_mois,
+    IF(numbers.n = 0, b.loyer_mois, b.loyer_mois * (tb.commission / 100)) AS gain
+FROM
+    location l
+JOIN
+    bien b ON l.id_bien = b.id_bien
+JOIN
+    type_bien tb ON b.id_type_bien = tb.id_type_bien
+JOIN
+    numbers ON numbers.n < l.duree_mois
+WHERE
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') BETWEEN '2024-03' AND '2024-06'
+ORDER BY
+    l.id_location,
+    month;
+
++-------------+-----------+--------------------+---------+------------+---------------+
+| id_location | id_client | bien_nom           | month   | loyer_mois | gain          |
++-------------+-----------+--------------------+---------+------------+---------------+
+|           1 |         1 | maison de vacances | 2024-02 |     200000 | 200000.000000 |
+|           1 |         1 | maison de vacances | 2024-03 |     200000 |  10000.000000 |
+|           1 |         1 | maison de vacances | 2024-04 |     200000 |  10000.000000 |
+|           1 |         1 | maison de vacances | 2024-05 |     200000 |  10000.000000 |
+|           2 |         3 | appart de lux      | 2024-05 |     400000 | 400000.000000 |
+|           2 |         3 | appart de lux      | 2024-06 |     400000 |  40000.000000 |
+|           2 |         3 | appart de lux      | 2024-07 |     400000 |  40000.000000 |
+|           2 |         3 | appart de lux      | 2024-08 |     400000 |  40000.000000 |
+|           2 |         3 | appart de lux      | 2024-09 |     400000 |  40000.000000 |
+|           3 |         1 | villa bleu         | 2024-05 |     500000 | 500000.000000 |
+|           3 |         1 | villa bleu         | 2024-06 |     500000 | 100000.000000 |
+|           3 |         1 | villa bleu         | 2024-07 |     500000 | 100000.000000 |
+|           4 |         2 | batiment A         | 2024-06 |     700000 | 700000.000000 |
+|           4 |         2 | batiment A         | 2024-07 |     700000 |  70000.000000 |
+|           5 |         2 | maison de campagne | 2024-03 |     150000 | 150000.000000 |
+|           6 |         3 | maison de campagne | 2024-05 |     150000 | 150000.000000 |
+|           6 |         3 | maison de campagne | 2024-06 |     150000 |   7500.000000 |
+|           6 |         3 | maison de campagne | 2024-07 |     150000 |   7500.000000 |
++-------------+-----------+--------------------+---------+------------+---------------+
+
+-- chiffre d'affaire et gain admin vrai
+SELECT
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+    SUM(IF(numbers.n = 0, b.loyer_mois, b.loyer_mois * (tb.commission / 100))) AS total_gain,
+    SUM(b.loyer_mois) AS total_loyer_mensuel
+FROM
+    location l
+JOIN
+    bien b ON l.id_bien = b.id_bien
+JOIN
+    type_bien tb ON b.id_type_bien = tb.id_type_bien
+JOIN
+    (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+     UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+     UNION ALL SELECT 10 UNION ALL SELECT 11) numbers ON numbers.n < l.duree_mois
+WHERE
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') BETWEEN '2024-03' AND '2024-06'
+GROUP BY
+    month
+ORDER BY
+    month;
+
+
+-- filtre chiffre d'affaire proprio et gain proprio vrai
+SELECT
+    p.id_proprietaire,
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+    SUM(IF(numbers.n = 0, b.loyer_mois, b.loyer_mois * (1 - tb.commission / 100))) AS total_gain,
+    SUM(b.loyer_mois) AS chiffre_affaire_mensuel
+FROM
+    location l
+JOIN
+    bien b ON l.id_bien = b.id_bien
+JOIN
+    type_bien tb ON b.id_type_bien = tb.id_type_bien
+JOIN
+    proprietaire p ON b.id_proprietaire = p.id_proprietaire
+JOIN
+    (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) numbers
+    ON numbers.n < l.duree_mois
+WHERE
+    p.id_proprietaire = 1 AND
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') BETWEEN '2024-03' AND '2024-06'
+GROUP BY
+    p.id_proprietaire,
+    month
+ORDER BY
+    month;
+
+-- filtre chiffre affaire  vrai
+SELECT
+    p.id_proprietaire,
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+    SUM(b.loyer_mois) AS chiffre_affaire_mensuel
+FROM
+    location l
+JOIN
+    bien b ON l.id_bien = b.id_bien
+JOIN
+    proprietaire p ON b.id_proprietaire = p.id_proprietaire
+JOIN
+    (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) numbers
+    ON numbers.n < l.duree_mois
+WHERE
+    p.id_proprietaire = 1 AND
+    DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') BETWEEN '2024-03' AND '2024-06'
+GROUP BY
+    p.id_proprietaire,
+    month
+ORDER BY
+    month;
+
+-- vérification import
+SELECT b.reference, b.nom, b.description, tb.nom AS type, tb.commission, b.region, b.loyer_mois, p.tel AS proprietaire
+FROM bien b
+JOIN type_bien tb ON b.id_type_bien = tb.id_type_bien
+JOIN proprietaire p ON b.id_proprietaire = p.id_proprietaire
+WHERE b.reference IN ('V110', 'V130', 'M340', 'I003');
+
+-- mitady disponibilité tode colonne be dia be amin'izay hita hoe tena marina
+mysql> SELECT
+    ->   b.id_bien,
+    ->   b.nom,
+    ->   b.description,
+    ->   b.region,
+    ->   b.loyer_mois,
+    ->   b.id_proprietaire,
+    ->   b.id_type_bien,
+    ->   l.date_debut,
+    ->   l.date_fin_prevu,
+    ->   l.duree_mois,
+    ->   l.disponibilite
+    -> FROM
+    ->   bien b
+    -> LEFT JOIN
+    ->   location l ON b.id_bien = l.id_bien
+    -> WHERE
+    ->   l.disponibilite IS NOT NULL;
++---------+---------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------+-----------------+--------------+------------+----------------+------------+---------------+
+| id_bien | nom                       | description                                                                                                                                                                             | region | loyer_mois | id_proprietaire | id_type_bien | date_debut | date_fin_prevu | duree_mois | disponibilite |
++---------+---------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------+-----------------+--------------+------------+----------------+------------+---------------+
+|       1 | Villa luxe en bord de mer | Magnifique villa de 250 m² avec vue imprenable sur la mer. Elle comprend 5 chambres, un grand séjour, une cuisine haut de gamme, et une piscine à débordement. Accès direct à la plage. | Boeny  |    1890000 |               1 |            1 | 2024-01-01 | 2024-04-01     |          3 | 2024-04-02    |
++---------+---------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------+-----------------+--------------+------------+----------------+------------+---------------+
+
+-- anaovana liste des biens miaraka disponibilité 
+SELECT
+  b.id_bien,
+  b.nom AS nom_bien,
+  b.description,
+  b.region,
+  b.loyer_mois,
+  p.tel AS tel_proprietaire,
+  t.nom AS type_bien,
+  l.date_debut,
+  l.date_fin_prevu,
+  l.duree_mois,
+  l.disponibilite,
+  ph.photo_url
+FROM
+  bien b
+LEFT JOIN
+  location l ON b.id_bien = l.id_bien
+LEFT JOIN
+  proprietaire p ON b.id_proprietaire = p.id_proprietaire
+LEFT JOIN
+  type_bien t ON b.id_type_bien = t.id_type_bien
+LEFT JOIN
+  photo ph ON b.id_bien = ph.id_bien
+WHERE
+  l.disponibilite IS NOT NULL;
+

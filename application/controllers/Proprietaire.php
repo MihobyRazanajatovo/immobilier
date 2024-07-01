@@ -27,14 +27,21 @@ class Proprietaire extends CI_Controller {
     }
 
     public function chiffre_affaires_proprio() {
+        $proprio_data = $this->session->userdata('proprietaire');
+        if (!$proprio_data) {
+            redirect('login/login_proprio_view');
+        }
+        $id_proprietaire = $proprio_data['id_proprietaire'];
+
         $start_date = $this->input->post('start_date');
         $end_date = $this->input->post('end_date');
-        
-        $data['results'] = array();
+
         if ($start_date && $end_date) {
-            $data['results'] = $this->Location_model->get_chiffre_affaires_proprio($start_date, $end_date);
+            $data['results'] = $this->Location_model->get_chiffre_affaires_proprio($id_proprietaire, $start_date, $end_date);
+        } else {
+            $data['results'] = null;
         }
-        
+
         $this->load->view('proprio/chiffre_affaire', $data);
     }
 

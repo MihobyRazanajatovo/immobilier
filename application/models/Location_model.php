@@ -1,17 +1,21 @@
 <?php
-class Location_model extends CI_Model {
+class Location_model extends CI_Model
+{
 
-    function __construct(){
+    function __construct()
+    {
         parent::__construct();
         $this->load->database();
     }
 
-    public function ajouter_location($data) {
+    public function ajouter_location($data)
+    {
         $this->db->insert('location', $data);
         return $this->db->insert_id();
     }
 
-    public function get_locations_by_client($id_client) {
+    public function get_locations_by_client($id_client)
+    {
         $this->db->select('*');
         $this->db->from('location');
         $this->db->where('id_client', $id_client);
@@ -19,7 +23,8 @@ class Location_model extends CI_Model {
         return $query->result_array();
     }
 
-    public function get_paiements_by_location($id_location) {
+    public function get_paiements_by_location($id_location)
+    {
         $this->db->select('*');
         $this->db->from('paiement');
         $this->db->where('id_location', $id_location);
@@ -27,7 +32,8 @@ class Location_model extends CI_Model {
         return $query->result_array();
     }
 
-    public function get_location_by_id($id_location) {
+    public function get_location_by_id($id_location)
+    {
         $this->db->select('*');
         $this->db->from('location');
         $this->db->where('id_location', $id_location);
@@ -35,67 +41,82 @@ class Location_model extends CI_Model {
         return $query->row_array();
     }
 
-    public function get_total_paye($id_location) {
+    public function get_total_paye($id_location)
+    {
         $this->db->select_sum('loyer_paye');
         $this->db->where('id_location', $id_location);
         $query = $this->db->get('paiement');
         return $query->row()->loyer_paye;
     }
 
-    // anaovana chiffre d'affaire admin
-    public function get_all_locations_with_biens() {
-        $this->db->select('location.*, bien.loyer_mois');
-        $this->db->from('location');
-        $this->db->join('bien', 'location.id_bien = bien.id_bien');
-        $query = $this->db->get();
+    // chiffre d'affaire et gain admin 
+    public function get_chiffre_gain_admin($start_date, $end_date)
+    {
+        $sql = "
+            SELECT
+                DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+                SUM(IF(numbers.n = 0, b.loyer_mois, b.loyer_mois * (tb.commission / 100))) AS total_gain,
+                SUM(b.loyer_mois) AS total_loyer_mensuel
+            FROM
+                location l
+            JOIN
+                bien b ON l.id_bien = b.id_bien
+            JOIN
+                type_bien tb ON b.id_type_bien = tb.id_type_bien
+            JOIN
+                (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+                UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+                UNION ALL SELECT 10 UNION ALL SELECT 11) numbers ON numbers.n < l.duree_mois
+            WHERE
+                DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') BETWEEN ? AND ?
+            GROUP BY
+                month
+            ORDER BY
+                month
+        ";
+
+        $query = $this->db->query($sql, array($start_date, $end_date));
         return $query->result_array();
     }
 
-    //get chiffre d'affaire entre deux mois
-    // public function get_total_rent_by_month($start_date, $end_date) {
-    //     $this->db->select("DATE_FORMAT(l.date_fin_prevu, '%Y-%m') AS mois, SUM(b.loyer_mois * l.duree_mois) AS total_rent");
-    //     $this->db->from('location l');
-    //     $this->db->join('bien b', 'l.id_bien = b.id_bien');
-    //     $this->db->where("DATE_FORMAT(l.date_debut, '%Y-%m') >=", $start_date);
-    //     $this->db->where("DATE_FORMAT(l.date_fin_prevu, '%Y-%m') <=", $end_date);
-    //     $this->db->group_by('mois');
-    //     $this->db->order_by('mois', 'ASC');
-        
-    //     $query = $this->db->get();
-    //     return $query->result();
-    // }
+    // chiffre d'affaire proprio et gain
+    public function get_chiffre_affaires_proprio($id_proprietaire, $start_date, $end_date)
+    {
+        $sql = "
+            SELECT
+                p.id_proprietaire,
+                DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') AS month,
+                SUM(IF(numbers.n = 0, b.loyer_mois, b.loyer_mois * (1 - tb.commission / 100))) AS total_gain,
+                SUM(b.loyer_mois) AS chiffre_affaire_mensuel
+            FROM
+                location l
+            JOIN
+                bien b ON l.id_bien = b.id_bien
+            JOIN
+                type_bien tb ON b.id_type_bien = tb.id_type_bien
+            JOIN
+                proprietaire p ON b.id_proprietaire = p.id_proprietaire
+            JOIN
+                (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+                UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+                UNION ALL SELECT 10 UNION ALL SELECT 11) numbers
+                ON numbers.n < l.duree_mois
+            WHERE
+                p.id_proprietaire = ? AND
+                DATE_FORMAT(DATE_ADD(l.date_debut, INTERVAL numbers.n MONTH), '%Y-%m') BETWEEN ? AND ?
+            GROUP BY
+                p.id_proprietaire,
+                month
+            ORDER BY
+                month
+        ";
 
-    //get chiffre d'affaire et gain entre deux mois
-    public function get_total_rent_and_gain_by_month($start_date, $end_date) {
-        $this->db->select("DATE_FORMAT(l.date_fin_prevu, '%Y-%m-%d') AS mois, SUM(b.loyer_mois * l.duree_mois) AS total_rent, SUM(b.loyer_mois * l.duree_mois * tb.commission / 100) AS gain");
-        $this->db->from('location l');
-        $this->db->join('bien b', 'l.id_bien = b.id_bien');
-        $this->db->join('type_bien tb', 'b.id_type_bien = tb.id_type_bien');
-        $this->db->where("DATE_FORMAT(l.date_debut, '%Y-%m-%d') >=", $start_date);
-        $this->db->where("DATE_FORMAT(l.date_fin_prevu, '%Y-%m-%d') <=", $end_date);
-        $this->db->group_by('mois');
-        $this->db->order_by('mois', 'ASC');
-        
-        $query = $this->db->get();
-        return $query->result();
+        $query = $this->db->query($sql, array($id_proprietaire, $start_date, $end_date));
+        return $query->result_array();
     }
 
-    public function get_chiffre_affaires_proprio($start_date, $end_date) {
-        $this->db->select("DATE_FORMAT(l.date_fin_prevu, '%Y-%m') AS mois, SUM(b.loyer_mois * l.duree_mois) AS chiffre_affaires");
-        $this->db->from('location l');
-        $this->db->join('bien b', 'l.id_bien = b.id_bien');
-        $this->db->join('type_bien tb', 'b.id_type_bien = tb.id_type_bien');
-        $this->db->where('b.id_proprietaire', 1);
-        $this->db->where("DATE_FORMAT(l.date_debut, '%Y-%m') >=", $start_date);
-        $this->db->where("DATE_FORMAT(l.date_fin_prevu, '%Y-%m') <=", $end_date);
-        $this->db->group_by('mois');
-        $this->db->order_by('mois', 'DESC');
-        
-        $query = $this->db->get();
-        return $query->result();
-    }
-
-    public function get_payment_status_by_client($id_client, $start_date, $end_date) {
+    public function get_payment_status_by_client($id_client, $start_date, $end_date)
+    {
         $sql = "SELECT 
                     b.nom AS property_name, 
                     DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) AS datepaiement, 
@@ -121,12 +142,27 @@ class Location_model extends CI_Model {
                     AND DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) BETWEEN ? AND ?
                 ORDER BY 
                     datepaiement ASC";
-    
+
         // Ajout de traces
         log_message('debug', 'SQL Query: ' . $this->db->last_query());
-    
+
         $query = $this->db->query($sql, array($id_client, $start_date, $end_date));
         return $query->result();
     }
+
+    public function add_location($data) {
+        return $this->db->insert('location', $data);
+    }
+
+    public function get_all_biens() {
+        $query = $this->db->get('bien');
+        return $query->result_array();
+    }
+
+    public function get_all_clients() {
+        $query = $this->db->get('client');
+        return $query->result_array();
+    }
+
     
 }

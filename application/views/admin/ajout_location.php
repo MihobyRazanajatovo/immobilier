@@ -32,44 +32,32 @@
                 <div class="col-sm-12 col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Chiffre d'Affaires et Gain de MADA IMMO</h4>
+                            <h4>Ajouter nouvelle location</h4>
                         </div>
                         <div class="card-body">
-                            <form method="post" action="<?php echo site_url('admin/chiffre_gain'); ?>" class="form-container">
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="start_date">Start Date (YYYY-MM):</label>
-                                        <input type="month" id="start_date" name="start_date" class="form-control" placeholder="Date début">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="end_date">End Date (YYYY-MM):</label>
-                                        <input type="month" id="end_date" name="end_date" class="form-control" placeholder="Date">
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-custom btn-block">Afficher</button>
+                            <form method="post" action="<?php echo site_url('admin/add'); ?>">
+                                <label for="id_bien">Select Property:</label>
+                                <select id="id_bien" name="id_bien" required>
+                                    <?php foreach ($biens as $bien) : ?>
+                                        <option value="<?php echo $bien['id_bien']; ?>"><?php echo $bien['nom']; ?></option>
+                                    <?php endforeach; ?>
+                                </select><br><br>
+
+                                <label for="id_client">Select Client:</label>
+                                <select id="id_client" name="id_client" required>
+                                    <?php foreach ($clients as $client) : ?>
+                                        <option value="<?php echo $client['id_client']; ?>"><?php echo $client['email']; ?></option>
+                                    <?php endforeach; ?>
+                                </select><br><br>
+
+                                <label for="date_debut">Start Date:</label>
+                                <input type="date" id="date_debut" name="date_debut" required><br><br>
+
+                                <label for="duree_mois">Duration (Months):</label>
+                                <input type="number" id="duree_mois" name="duree_mois" required><br><br>
+
+                                <button type="submit">Ajouter</button>
                             </form>
-                            <div class="mt-4">
-                                <?php if (!empty($results)) : ?>
-                                    <table class="table table-hover">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th scope="col">Mois</th>
-                                                <th scope="col">Gain</th>
-                                                <th scope="col">Chiffre d'Affaire</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($results as $row) : ?>
-                                                <tr>
-                                                    <td><?php echo $row['month']; ?></td>
-                                                    <td><?php echo $row['total_gain']; ?></td>
-                                                    <td><?php echo $row['total_loyer_mensuel']; ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                <?php endif; ?>
-                            </div>
                         </div>
                     </div>
                 </div>
