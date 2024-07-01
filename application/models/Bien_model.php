@@ -63,28 +63,18 @@ class Bien_model extends CI_Model {
             b.loyer_mois,
             p.tel AS tel_proprietaire,
             t.nom AS type_bien,
-            l.date_debut,
-            l.date_fin_prevu,
-            l.duree_mois,
-            l.disponibilite
+            COALESCE(l.disponibilite, "Disponible") AS disponibilite,
+            ph.photo_url
         ');
         $this->db->from('bien b');
         $this->db->join('location l', 'b.id_bien = l.id_bien', 'left');
         $this->db->join('proprietaire p', 'b.id_proprietaire = p.id_proprietaire', 'left');
         $this->db->join('type_bien t', 'b.id_type_bien = t.id_type_bien', 'left');
-        $this->db->where('l.disponibilite IS NOT NULL');
+        $this->db->join('photo ph', 'b.id_bien = ph.id_bien', 'left');
+        $this->db->order_by('b.id_bien');
 
-        $biens = $this->db->get()->result_array();
-
-        foreach ($biens as &$bien) {
-            $this->db->select('photo_url');
-            $this->db->from('photo');
-            $this->db->where('id_bien', $bien['id_bien']);
-            $photos = $this->db->get()->result_array();
-            $bien['photos'] = $photos;
-        }
-
-        return $biens;
+        $query = $this->db->get();
+        return $query->result_array();
     }
     
 }

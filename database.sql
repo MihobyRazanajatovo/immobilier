@@ -803,10 +803,7 @@ SELECT
   b.loyer_mois,
   p.tel AS tel_proprietaire,
   t.nom AS type_bien,
-  l.date_debut,
-  l.date_fin_prevu,
-  l.duree_mois,
-  l.disponibilite,
+  COALESCE(l.disponibilite, 'Disponible') AS disponibilite,
   ph.photo_url
 FROM
   bien b
@@ -818,6 +815,7 @@ LEFT JOIN
   type_bien t ON b.id_type_bien = t.id_type_bien
 LEFT JOIN
   photo ph ON b.id_bien = ph.id_bien
-WHERE
-  l.disponibilite IS NOT NULL;
+ORDER BY
+  b.id_bien;
+
 

@@ -32,14 +32,12 @@
                                 <p>Loyer par mois : <?php echo $bien['loyer_mois']; ?></p>
                                 <p>Numéro proprietaire : <?php echo $bien['tel_proprietaire']; ?></p>
                                 <p>Date de disponibilite : <?php echo $bien['disponibilite']; ?></p>
-                                <?php if (!empty($bien['photos'])) : ?>
+                                <?php if (!empty($bien['photo_url'])): ?>
                                     <div id="carousel<?php echo $bien['id_bien']; ?>" class="carousel slide" data-ride="carousel">
                                         <div class="carousel-inner">
-                                            <?php foreach ($bien['photos'] as $index => $photo) : ?>
                                                 <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
                                                     <img src="<?php echo $photo['photo_url']; ?>" class="d-block w-100" alt="Photo">
                                                 </div>
-                                            <?php endforeach; ?>
                                         </div>
                                         <a class="carousel-control-prev" href="#carousel<?php echo $bien['id_bien']; ?>" role="button" data-slide="prev">
                                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
