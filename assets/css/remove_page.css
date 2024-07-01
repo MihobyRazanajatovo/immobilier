@@ -1,0 +1,22 @@
+
+.parking-lot ul {
+    list-style: none;
+}
+
+.parking-lot li {
+    margin-bottom: 10px;
+}
+
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

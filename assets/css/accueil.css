@@ -1,0 +1,42 @@
+.property-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    height: 100%;
+}
+.property-card h3 {
+    font-size: 1.5em;
+    margin: 0 0 10px 0;
+}
+.property-card p {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+}
+.property-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.carousel-inner img {
+    max-height: 200px;
+    object-fit: cover;
+}
+.property-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: -10px; /* Adjust this for overall row spacing */
+}
+.property-list > .col-lg-4 {
+    padding: 10px; /* Adjust this for column spacing */
+}
+.d-flex {
+    display: flex;
+    flex: 1;
+}

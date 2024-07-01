@@ -1,0 +1,31 @@
+.parking-lot {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    gap: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.parking-space {
+    width: 50px;
+    height: 50px;
+    background-color: lightgray;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.libre {
+    background-color: #AAC4E7;
+}
+
+.occupé {
+    background-color: #D45836;
+}
+
+.infraction {
+    background-color: #C19570;
+}
