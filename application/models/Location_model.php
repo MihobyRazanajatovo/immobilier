@@ -118,30 +118,36 @@ class Location_model extends CI_Model
     public function get_payment_status_by_client($id_client, $start_date, $end_date)
     {
         $sql = "SELECT 
-                    b.nom AS property_name, 
-                    DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) AS datepaiement, 
-                    b.loyer_mois AS montant, 
-                    CASE 
-                        WHEN DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) <= CURRENT_DATE THEN 'paid'
-                        ELSE 'unpaid'
-                    END AS status,
-                    CASE 
-                        WHEN DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) <= CURRENT_DATE THEN 0
+                b.nom AS property_name, 
+                DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) AS datepaiement, 
+                CASE 
+                    WHEN n.n = 1 THEN b.loyer_mois * 2
+                    ELSE b.loyer_mois
+                END AS montant,
+                CASE 
+                    WHEN DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) <= CURRENT_DATE THEN 'paid'
+                    ELSE 'unpaid'
+                END AS status,
+                CASE 
+                    WHEN DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) <= CURRENT_DATE THEN 0
+                    ELSE CASE 
+                        WHEN n.n = 1 THEN b.loyer_mois * 2
                         ELSE b.loyer_mois
-                    END AS prix_a_payer_ou_restant
-                FROM 
-                    (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
-                     SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL 
-                     SELECT 11 UNION ALL SELECT 12) AS n
-                JOIN 
-                    location l ON n.n <= l.duree_mois
-                JOIN 
-                    bien b ON l.id_bien = b.id_bien
-                WHERE 
-                    l.id_client = ?
-                    AND DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) BETWEEN ? AND ?
-                ORDER BY 
-                    datepaiement ASC";
+                    END
+                END AS prix_a_payer_ou_restant
+            FROM 
+                (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
+                 SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL 
+                 SELECT 11 UNION ALL SELECT 12) AS n
+            JOIN 
+                location l ON n.n <= l.duree_mois
+            JOIN 
+                bien b ON l.id_bien = b.id_bien
+            WHERE 
+                l.id_client = ?
+                AND DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) BETWEEN ? AND ?
+            ORDER BY 
+                datepaiement ASC";
 
         // Ajout de traces
         log_message('debug', 'SQL Query: ' . $this->db->last_query());
@@ -150,19 +156,20 @@ class Location_model extends CI_Model
         return $query->result();
     }
 
-    public function add_location($data) {
+    public function add_location($data)
+    {
         return $this->db->insert('location', $data);
     }
 
-    public function get_all_biens() {
+    public function get_all_biens()
+    {
         $query = $this->db->get('bien');
         return $query->result_array();
     }
 
-    public function get_all_clients() {
+    public function get_all_clients()
+    {
         $query = $this->db->get('client');
         return $query->result_array();
     }
-
-    
 }

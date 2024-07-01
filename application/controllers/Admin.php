@@ -11,6 +11,7 @@ class Admin extends CI_Controller
         $this->load->helper('url');
         $this->load->library('session');
         $this->load->model('Location_model');
+        $this->load->model('Bien_model');
         date_default_timezone_set('Europe/Paris');
     }
 
@@ -21,7 +22,7 @@ class Admin extends CI_Controller
 
     public function reset_tables() {
         $this->db->query('SET FOREIGN_KEY_CHECKS = 0');
-        $tables = ['proprietaire','type_bien', 'bien', 'location', 'paiement', 'vente'];
+        $tables = ['client','proprietaire','type_bien', 'bien', 'location', 'paiement', 'vente'];
         foreach ($tables as $table) {
             $this->db->truncate($table);
         }
@@ -76,5 +77,10 @@ class Admin extends CI_Controller
         $date_fin_prevu_obj = new DateTime($date_debut_obj->format('Y-m-t'));
 
         return $date_fin_prevu_obj->format('Y-m-d');
+    }
+
+    public function location_details() {
+        $data['locations'] = $this->Bien_model->get_location_details();
+        $this->load->view('admin/details_location', $data);
     }
 }

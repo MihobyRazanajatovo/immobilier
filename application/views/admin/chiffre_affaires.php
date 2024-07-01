@@ -59,14 +59,27 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($results as $row) : ?>
+                                            <?php
+                                            $total_chiffre_affaire = 0;
+                                            $total_loyer_mensuel = 0;
+                                            foreach ($results as $row) :
+                                                $total_chiffre_affaire += $row['total_gain'];
+                                                $total_loyer_mensuel += $row['total_loyer_mensuel'];
+                                            ?>
                                                 <tr>
                                                     <td><?php echo $row['month']; ?></td>
-                                                    <td><?php echo $row['total_gain']; ?></td>
-                                                    <td><?php echo $row['total_loyer_mensuel']; ?></td>
+                                                    <td><?php echo number_format($row['total_gain'], 2, '.', ','); ?></td>
+                                                    <td><?php echo number_format($row['total_loyer_mensuel'], 2, '.', ','); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Total</th>
+                                                <th><?php echo number_format($total_chiffre_affaire, 2, '.', ','); ?></th>
+                                                <th><?php echo number_format($total_loyer_mensuel, 2, '.', ','); ?></th>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 <?php endif; ?>
                             </div>

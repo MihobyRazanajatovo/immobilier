@@ -329,6 +329,32 @@ WHERE
 ORDER BY 
     datepaiement ASC;
 
+-- ilay fois 2
+SELECT 
+    b.nom AS property_name, 
+    DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) AS datepaiement, 
+    CASE 
+        WHEN n.n = 1 THEN b.loyer_mois * 2
+        ELSE b.loyer_mois
+    END AS montant, 
+    CASE 
+        WHEN DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) <= CURRENT_DATE THEN 'paid'
+        ELSE 'unpaid'
+    END AS status
+FROM 
+    (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
+     SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL 
+     SELECT 11 UNION ALL SELECT 12) AS n
+JOIN 
+    location l ON n.n <= l.duree_mois
+JOIN 
+    bien b ON l.id_bien = b.id_bien
+WHERE 
+    l.id_client = 1
+    AND DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) BETWEEN '2024-01-01' AND '2024-12-01'
+ORDER BY 
+    datepaiement ASC;
+
 -- loyer à payer et payé sans paiement misy montant
 SELECT 
     b.nom AS property_name, 
@@ -762,12 +788,27 @@ GROUP BY
 ORDER BY
     month;
 
--- vérification import
-SELECT b.reference, b.nom, b.description, tb.nom AS type, tb.commission, b.region, b.loyer_mois, p.tel AS proprietaire
+-- vérification import bien
+SELECT b.reference, b.nom, b.description, tb.nom AS type, b.region, b.loyer_mois, p.tel AS proprietaire
 FROM bien b
 JOIN type_bien tb ON b.id_type_bien = tb.id_type_bien
 JOIN proprietaire p ON b.id_proprietaire = p.id_proprietaire
 WHERE b.reference IN ('V110', 'V130', 'M340', 'I003');
+-- vérification import location
+SELECT 
+    l.id_location,
+    l.date_debut,
+    l.duree_mois,
+    l.date_fin_prevu,
+    c.email AS client_email,
+    b.reference AS bien_reference
+FROM 
+    location l
+JOIN 
+    client c ON l.id_client = c.id_client
+JOIN 
+    bien b ON l.id_bien = b.id_bien;
+
 
 -- mitady disponibilité tode colonne be dia be amin'izay hita hoe tena marina
 mysql> SELECT
@@ -818,4 +859,37 @@ LEFT JOIN
 ORDER BY
   b.id_bien;
 
+-- details location
+SELECT 
+    b.nom AS designation, 
+    b.loyer_mois, 
+    DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) AS mois, 
+    CASE 
+        WHEN n.n = 1 THEN '100%'
+        ELSE CONCAT(t.commission, '%')
+    END AS commission,
+    n.n AS num_mois_location,
+    CASE 
+        WHEN n.n = 1 THEN b.loyer_mois
+        ELSE b.loyer_mois * t.commission / 100
+    END AS valeur_commission,
+    CASE 
+        WHEN n.n = 1 THEN b.loyer_mois * 2
+        ELSE b.loyer_mois
+    END AS loyer_du_mois
+FROM 
+    (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
+     SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL 
+     SELECT 11 UNION ALL SELECT 12) AS n
+JOIN 
+    location l ON n.n <= l.duree_mois
+JOIN 
+    bien b ON l.id_bien = b.id_bien
+JOIN
+    type_bien t ON b.id_type_bien = t.id_type_bien
+ORDER BY 
+    l.id_location, mois ASC;
 
+-- requete mi calcul fin mois ho tode farany iny
+UPDATE location
+SET date_fin_prevu = DATE_FORMAT(LAST_DAY(DATE_ADD(date_debut, INTERVAL duree_mois - 1 MONTH)), '%Y-%m-%d');

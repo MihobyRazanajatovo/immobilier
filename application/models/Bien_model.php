@@ -83,5 +83,40 @@ class Bien_model extends CI_Model {
 
         return $biens;
     }
+
+    public function get_location_details() {
+        $query = $this->db->query("
+            SELECT 
+                b.nom AS designation, 
+                b.loyer_mois, 
+                DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) AS mois, 
+                CASE 
+                    WHEN n.n = 1 THEN '100%'
+                    ELSE CONCAT(t.commission, '%')
+                END AS commission,
+                n.n AS num_mois_location,
+                CASE 
+                    WHEN n.n = 1 THEN b.loyer_mois
+                    ELSE b.loyer_mois * t.commission / 100
+                END AS valeur_commission,
+                CASE 
+                    WHEN n.n = 1 THEN b.loyer_mois * 2
+                    ELSE b.loyer_mois
+                END AS loyer_du_mois
+            FROM 
+                (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
+                 SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL 
+                 SELECT 11 UNION ALL SELECT 12) AS n
+            JOIN 
+                location l ON n.n <= l.duree_mois
+            JOIN 
+                bien b ON l.id_bien = b.id_bien
+            JOIN
+                type_bien t ON b.id_type_bien = t.id_type_bien
+            ORDER BY 
+                b.id_bien, mois ASC
+        ");
+        return $query->result_array();
+    }
     
 }
