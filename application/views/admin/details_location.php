@@ -84,6 +84,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="<?php echo base_url('assets/js/backend-bundle.min.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/backend-bundle.min.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/customizer.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/sidebar.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/flex-tree.min.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/tree.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/table-treeview.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/sweetalert.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/vector-map-custom.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/chart-custom.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/charts/01.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/charts/02.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/js/slider.js'); ?>"></script>
+    <script src="<?php echo base_url('assets/vendor/emoji-picker-element/index.js'); ?>" type="module"></script>
+    <script src="<?php echo base_url('assets/js/app.js'); ?>"></script>
 </body>
 
 </html>

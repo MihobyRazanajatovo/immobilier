@@ -18,9 +18,7 @@ class Proprietaire extends CI_Controller {
             redirect('login/login_proprio_view');
         }
         $id_proprietaire = $proprio_data['id_proprietaire'];
-        $biens = $this->Bien_model->get_biens_with_photos($id_proprietaire);
-       
-        $data['biens'] = $biens;
+        $data['biens'] = $this->Bien_model->get_biens_with_disponibilite($id_proprietaire);
 
         $this->load->view('proprio/accueil_proprio', $data);
         

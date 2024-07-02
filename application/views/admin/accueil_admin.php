@@ -10,6 +10,41 @@
     <link rel="shortcut icon" href="<?php echo base_url('assets/images/favicon.ico'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('assets/css/backend-plugin.min.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('assets/css/backend.css?v=1.0.0'); ?>">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .header-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header-title h4 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .btn-custom {
+            background-color: #eb631b;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #d45a1a;
+            color: #fff;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,11 +54,11 @@
             <div class="row">
                 <div class="col-sm-12 col-lg-12">
                     <div class="card">
-                        <div class="card-header d-flex justify-content-between">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <div class="header-title">
                                 <h4 class="card-title">Réinitialiser votre base?</h4>
                                 <form action="<?php echo base_url('Admin/reset_tables'); ?>" method="post">
-                                    <button type="submit" class="button-86">Réinitialiser</button>
+                                    <button type="submit" class="btn btn-custom">Réinitialiser</button>
                                 </form>
                             </div>
                         </div>
@@ -35,7 +70,7 @@
                                         <label for="csv_file_biens">Importer un fichier CSV</label>
                                         <input type="file" name="csv_file_biens" class="form-control" required>
                                     </div>
-                                    <button type="submit" name="import" class="btn btn-primary">Importer</button>
+                                    <button type="submit" name="import" class="btn btn-custom">Importer</button>
                                 </form>
                             </div>
 
@@ -46,7 +81,7 @@
                                         <label for="csv_file_locations">Importer un fichier CSV</label>
                                         <input type="file" name="csv_file_locations" class="form-control" required>
                                     </div>
-                                    <button type="submit" name="import_locations" class="btn btn-primary">Importer</button>
+                                    <button type="submit" name="import_locations" class="btn btn-custom">Importer</button>
                                 </form>
                             </div>
                             <div class="header-title">
@@ -56,7 +91,7 @@
                                         <label for="csv_file_commissions">Fichier CSV pour les commissions</label>
                                         <input type="file" name="csv_file_commissions" class="form-control" required>
                                     </div>
-                                    <button type="submit" name="import_commissions" class="btn btn-primary">Importer</button>
+                                    <button type="submit" name="import_commissions" class="btn btn-custom">Importer</button>
                                 </form>
                             </div>
                         </div>

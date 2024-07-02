@@ -12,28 +12,78 @@
     <link rel="stylesheet" href="<?php echo base_url('assets/css/backend-plugin.min.css'); ?>">
     <link rel="stylesheet" href="<?php echo base_url('assets/css/backend.css?v=1.0.0'); ?>">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        .property-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .property-card h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .property-card p {
+            margin: 0.5em 0;
+        }
+
+        .property-card img {
+            width: 100%;
+            height: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: black;
+        }
+
+        .property-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .property-list .col-md-6.col-lg-4 {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
 </head>
 
 <body>
-<?php include('header_proprio.php'); ?>
+    <?php include('header_proprio.php'); ?>
     <div class="content-page">
         <div class="container-fluid">
             <h1>Biens du Propriétaire</h1>
             <?php if (!empty($biens)) : ?>
                 <div class="row property-list">
                     <?php foreach ($biens as $bien) : ?>
-                        <div class="col-md-6 col-lg-3 d-flex">
+                        <div class="col-md-6 col-lg-4 d-flex">
                             <div class="property-card">
                                 <h3><?php echo $bien['nom']; ?></h3>
                                 <p>Description : <?php echo $bien['description']; ?></p>
                                 <p>Région : <?php echo $bien['region']; ?></p>
                                 <p>Loyer par mois : <?php echo $bien['loyer_mois']; ?></p>
-                                <?php if (!empty($bien['photo'])) : ?>
+                                <p>Date de fin prévue : <?php echo $bien['date_fin_prevu']; ?></p>
+                                <p>Date de disponibilité : <?php echo $bien['date_disponibilite']; ?></p>
+                                <p>Statut de disponibilité : <?php echo $bien['statut_disponibilite']; ?></p>
+                                <?php if (!empty($bien['photos'])) : ?>
                                     <div id="carousel-<?php echo $bien['id_bien']; ?>" class="carousel slide" data-ride="carousel">
                                         <div class="carousel-inner">
-                                            <?php foreach ($bien['photo'] as $index => $photo) : ?>
+                                            <?php foreach ($bien['photos'] as $index => $photo) : ?>
                                                 <div class="carousel-item <?php echo ($index === 0) ? 'active' : ''; ?>">
-                                                    <img src="<?php echo base_url($photo['photo_url']); ?>" class="d-block w-100" alt="Photo du bien">
+                                                    <img src="<?php echo base_url($photo); ?>" class="d-block w-100" alt="Photo du bien">
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
@@ -62,37 +112,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="<?php echo base_url('assets/js/backend-bundle.min.js'); ?>"></script>
-    <!-- Chart Custom JavaScript -->
     <script src="<?php echo base_url('assets/js/customizer.js'); ?>"></script>
-
     <script src="<?php echo base_url('assets/js/sidebar.js'); ?>"></script>
-
-    <!-- Flextree Javascript-->
     <script src="<?php echo base_url('assets/js/flex-tree.min.js'); ?>"></script>
     <script src="<?php echo base_url('assets/js/tree.js'); ?>"></script>
-
-    <!-- Table Treeview JavaScript -->
     <script src="<?php echo base_url('assets/js/table-treeview.js'); ?>"></script>
-
-    <!-- SweetAlert JavaScript -->
     <script src="<?php echo base_url('assets/js/sweetalert.js'); ?>"></script>
-
-    <!-- Vectoe Map JavaScript -->
     <script src="<?php echo base_url('assets/js/vector-map-custom.js'); ?>"></script>
-
-    <!-- Chart Custom JavaScript -->
     <script src="<?php echo base_url('assets/js/chart-custom.js'); ?>"></script>
     <script src="<?php echo base_url('assets/js/charts/01.js'); ?>"></script>
     <script src="<?php echo base_url('assets/js/charts/02.js'); ?>"></script>
-
-    <!-- slider JavaScript -->
     <script src="<?php echo base_url('assets/js/slider.js'); ?>"></script>
-
-    <!-- Emoji picker -->
     <script src="<?php echo base_url('assets/vendor/emoji-picker-element/index.js'); ?>" type="module"></script>
-
-
-    <!-- app JavaScript -->
     <script src="<?php echo base_url('assets/js/app.js'); ?>"></script>
 </body>
 

@@ -340,7 +340,14 @@ SELECT
     CASE 
         WHEN DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) <= CURRENT_DATE THEN 'paid'
         ELSE 'unpaid'
-    END AS status
+    END AS status,
+    CASE 
+        WHEN DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) <= CURRENT_DATE THEN 0
+        ELSE CASE 
+            WHEN n.n = 1 THEN b.loyer_mois * 2
+            ELSE b.loyer_mois
+        END
+    END AS prix_a_payer_ou_restant
 FROM 
     (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
      SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL 
@@ -350,10 +357,11 @@ JOIN
 JOIN 
     bien b ON l.id_bien = b.id_bien
 WHERE 
-    l.id_client = 1
+    l.id_client = 4
     AND DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) BETWEEN '2024-01-01' AND '2024-12-01'
 ORDER BY 
     datepaiement ASC;
+
 
 -- loyer à payer et payé sans paiement misy montant
 SELECT 
@@ -811,24 +819,24 @@ JOIN
 
 
 -- mitady disponibilité tode colonne be dia be amin'izay hita hoe tena marina
-mysql> SELECT
-    ->   b.id_bien,
-    ->   b.nom,
-    ->   b.description,
-    ->   b.region,
-    ->   b.loyer_mois,
-    ->   b.id_proprietaire,
-    ->   b.id_type_bien,
-    ->   l.date_debut,
-    ->   l.date_fin_prevu,
-    ->   l.duree_mois,
-    ->   l.disponibilite
-    -> FROM
-    ->   bien b
-    -> LEFT JOIN
-    ->   location l ON b.id_bien = l.id_bien
-    -> WHERE
-    ->   l.disponibilite IS NOT NULL;
+ SELECT
+b.id_bien,
+b.nom,
+b.description,
+b.region,
+b.loyer_mois,
+b.id_proprietaire,
+b.id_type_bien,
+l.date_debut,
+l.date_fin_prevu,
+l.duree_mois,
+l.disponibilite
+FROM
+bien b
+LEFT JOIN
+location l ON b.id_bien = l.id_bien
+WHERE
+l.disponibilite IS NOT NULL;
 +---------+---------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------+-----------------+--------------+------------+----------------+------------+---------------+
 | id_bien | nom                       | description                                                                                                                                                                             | region | loyer_mois | id_proprietaire | id_type_bien | date_debut | date_fin_prevu | duree_mois | disponibilite |
 +---------+---------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+------------+-----------------+--------------+------------+----------------+------------+---------------+
@@ -893,3 +901,29 @@ ORDER BY
 -- requete mi calcul fin mois ho tode farany iny
 UPDATE location
 SET date_fin_prevu = DATE_FORMAT(LAST_DAY(DATE_ADD(date_debut, INTERVAL duree_mois - 1 MONTH)), '%Y-%m-%d');
+
+-- disponibilité proprio vrai
+SELECT 
+    b.id_bien, 
+    b.nom, 
+    b.description, 
+    b.region, 
+    b.loyer_mois, 
+    MAX(l.date_fin_prevu) AS date_fin_prevu, 
+    DATE_ADD(MAX(l.date_fin_prevu), INTERVAL 1 DAY) AS disponibilite
+FROM 
+    bien b
+LEFT JOIN 
+    location l ON b.id_bien = l.id_bien
+WHERE 
+    b.id_proprietaire = 1
+GROUP BY 
+    b.id_bien, 
+    b.nom, 
+    b.description, 
+    b.region, 
+    b.loyer_mois
+ORDER BY 
+    b.nom;
+
+
