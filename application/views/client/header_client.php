@@ -5,7 +5,7 @@
                 <a href="#" class="header-logo">
                     <img src="<?php echo base_url('assets/images/logo.png'); ?>" class="img-fluid rounded-normal light-logo" alt="logo">
                     <img src="<?php echo base_url('assets/images/logo-dark.png'); ?>" class="img-fluid rounded-normal d-none sidebar-light-img" alt="logo">
-                    <span>Parking</span>
+                    <span>Mada Immo</span>
                 </a>
                 <div class="side-menu-bt-sidebar-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="text-light wrapper-menu" width="30" fill="none" viewBox="0 0 24 24" stroke="currentColor">

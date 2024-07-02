@@ -39,6 +39,28 @@
             padding: 20px;
         }
 
+        .alert {
+            padding: 10px;
+            background-color: #f44336;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .alert-close {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            font-size: 22px;
+            line-height: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .alert-close:hover {
+            color: black;
+        }
+
         form {
             max-width: 600px;
             margin: 0;
@@ -88,6 +110,12 @@
                             <h4>Ajouter nouvelle location</h4>
                         </div>
                         <div class="card-body">
+                            <?php if ($this->session->flashdata('error')) : ?>
+                                <div class="alert">
+                                    <span class="alert-close" onclick="this.parentElement.style.display='none';">&times;</span> 
+                                    <?php echo $this->session->flashdata('error'); ?>
+                                </div>
+                            <?php endif; ?>
                             <form method="post" action="<?php echo site_url('admin/add'); ?>">
                                 <label for="id_bien">Sélectionner un bien:</label>
                                 <select id="id_bien" name="id_bien" required>
