@@ -118,7 +118,7 @@ class Location_model extends CI_Model
     public function get_payment_status_by_client($id_client, $start_date, $end_date)
     {
         $sql = "
-            SELECT 
+        SELECT 
                 b.nom AS property_name, 
                 DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) AS datepaiement, 
                 CASE 
@@ -145,11 +145,11 @@ class Location_model extends CI_Model
             JOIN 
                 bien b ON l.id_bien = b.id_bien
             WHERE 
-                l.id_client = ?
+                l.id_client = ? 
                 AND DATE_ADD(l.date_debut, INTERVAL (n.n - 1) MONTH) BETWEEN ? AND ?
             ORDER BY 
-                datepaiement ASC
-        ";
+                datepaiement ASC;
+    ";
 
         $query = $this->db->query($sql, array($id_client, $start_date, $end_date));
         return $query->result();
